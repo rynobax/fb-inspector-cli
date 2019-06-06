@@ -1,6 +1,6 @@
 import { useReducer } from 'react';
 
-type State = string[];
+type Parts = string[];
 
 interface ActionPush {
   type: 'push';
@@ -11,17 +11,26 @@ interface ActionPop {
   type: 'pop';
 }
 
-type Action = ActionPush | ActionPop;
+interface ActionEdit {
+  type: 'edit';
+  ndx: number;
+  value: string;
+}
 
-function reducer(state: State, action: Action) {
+export type PathAction = ActionPush | ActionPop | ActionEdit;
+
+function reducer(parts: Parts, action: PathAction) {
+  // console.log(action);
   switch (action.type) {
     case 'pop':
-      const copy = state;
+      const copy = parts;
       copy.pop();
       return copy;
     case 'push':
-      return [...state, action.path];
+      return [...parts, action.path];
+    case 'edit':
+      return parts.map((s, i) => (i === action.ndx ? action.value : s));
   }
 }
 
-export default () => useReducer(reducer, ['example', 'path']);
+export default () => useReducer(reducer, ['example', 'path', 'with', 'content']);

@@ -1,13 +1,22 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect } from 'react';
 import { StdinContext } from 'ink';
-import { Observable } from 'rxjs';
-import { map, filter } from 'rxjs/operators';
+import { Observable, Subscription } from 'rxjs';
+import { map, filter, partition } from 'rxjs/operators';
+
+type NavKeysMap = typeof navKeysMap;
+const navKeysMap = {
+  '\u001B[A': 'up' as const,
+  '\u001B[B': 'down' as const,
+  '\u001B[C': 'right' as const,
+  '\u001B[D': 'left' as const,
+  '\r': 'enter' as const,
+};
 
 function nonNull<T>(v: T | null): v is T {
   return v !== null;
 }
 
-export type Key = 'up' | 'down' | 'left' | 'right' | 'enter';
+export type NavKey = NavKeysMap[keyof NavKeysMap];
 
 interface ContextContent {
   readonly stdin: NodeJS.ReadStream;
@@ -16,7 +25,7 @@ interface ContextContent {
 }
 
 function makeObs({ stdin, setRawMode }: ContextContent) {
-  return new Observable<Buffer>(obs => {
+  const obs = new Observable<Buffer>(obs => {
     const dataFn = (data: Buffer) => obs.next(data);
     const errFn = (err: Error) => obs.error(err);
     const finishFn = () => obs.complete();
@@ -30,38 +39,53 @@ function makeObs({ stdin, setRawMode }: ContextContent) {
       stdin.removeListener('data', dataFn);
       stdin.removeListener('error', errFn);
       stdin.removeListener('close', finishFn);
-      if (setRawMode) setRawMode(false);
     };
-  })
-    .pipe(
-      map(
-        (buf): Key | null => {
-          console.log(buf);
-          switch (String(buf)) {
-            case '\u001B[A':
-              return 'up' as const;
-            case '\u001B[B':
-              return 'down' as const;
-            case '\u001B[D':
-              return 'left' as const;
-            case '\u001B[C':
-              return 'right' as const;
-            case '\r':
-              return 'enter' as const;
-            case '\x03':
-              // ctrl + c
-              return process.exit();
-            default:
-              return null;
-          }
-        }
-      )
-    )
-    .pipe(filter(nonNull));
+  }).pipe(map(String));
+  return partition(buf => String(buf) in navKeysMap)(obs) as [
+    Observable<string>,
+    Observable<string>
+  ];
 }
 
-export function useKeyPress(onMsg: (key: Key) => void) {
+interface UseKeyPressParams {
+  onNav?: (key: NavKey) => void;
+  onNonNav?: (key: string) => void;
+}
+
+export function useKeyPress({ onNav, onNonNav }: UseKeyPressParams) {
   const ctx = useContext(StdinContext);
-  const [obs] = useState(() => makeObs(ctx).subscribe({ next: onMsg }));
-  return obs;
+  useEffect(() => {
+    const [navKeyObs, nonNavKeyObs] = makeObs(ctx);
+    const subs: Subscription[] = [];
+    if (onNav)
+      subs.push(
+        navKeyObs
+          .pipe(
+            map(
+              (c): NavKey | null => {
+                switch (c) {
+                  case '\u001B[A':
+                    return 'up' as const;
+                  case '\u001B[B':
+                    return 'down' as const;
+                  case '\u001B[D':
+                    return 'left' as const;
+                  case '\u001B[C':
+                    return 'right' as const;
+                  case '\r':
+                    return 'enter' as const;
+                  default:
+                    return null;
+                }
+              }
+            )
+          )
+          .pipe(filter(nonNull))
+          .subscribe({ next: onNav })
+      );
+    if (onNonNav) subs.push(nonNavKeyObs.subscribe({ next: onNonNav }));
+    return () => {
+      subs.forEach(s => s.unsubscribe());
+    };
+  }, [onNav, onNonNav, ctx]);
 }

@@ -6,7 +6,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "tsdx watch",
+    "start": "nodemon",
     "build": "tsdx build",
     "test": "tsdx test --env=jsdom"
   },
@@ -22,13 +22,16 @@
     "trailingComma": "es5"
   },
   "devDependencies": {
+    "@types/blessed": "^0.1.11",
     "@types/got": "^9.4.4",
     "@types/jest": "^24.0.13",
     "@types/react": "^16.8.19",
+    "@types/react-blessed": "^0.3.1",
     "@typescript-eslint/parser": "^1.9.0",
     "eslint": "^5.16.0",
     "eslint-plugin-react-hooks": "^1.6.0",
     "husky": "^2.4.0",
+    "nodemon": "^1.19.1",
     "prettier": "^1.17.1",
     "pretty-quick": "^1.11.0",
     "tsdx": "^0.6.1",
@@ -36,9 +39,10 @@
     "typescript": "^3.5.1"
   },
   "dependencies": {
+    "blessed": "^0.1.81",
     "got": "^9.6.0",
-    "ink": "^2.2.0",
     "react": "^16.8.6",
+    "react-blessed": "^0.6.0",
     "rxjs": "^6.5.2"
   }
 }

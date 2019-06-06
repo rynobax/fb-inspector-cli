@@ -1,24 +1,21 @@
 import React from 'react';
-import usePath from '../hooks/path';
-import Box from '../components/SelectableBox';
-import Path from './Path';
-import { useKeyPress } from '../hooks/io';
-
-setTimeout(() => {
-  process.exit();
-}, 10000);
+// import usePath from '../hooks/path';
+import Box from '../components/Box';
+// import Path from './Path';
+// import { useKeyPress } from '../hooks/io';
+// import * as blessed from 'blessed';
 
 const Main: React.FC = () => {
-  const [path, pathDispatch] = usePath();
-  useKeyPress({
-    onNonNav: key => {
-      if (key === '\x03') process.exit();
-    },
-  });
   return (
-    <Box height="100%" width="100%" flexDirection="column">
-      <Path path={path} selected={false} pathDispatch={pathDispatch} />
-      <Box selected>All the data</Box>
+    <Box
+      top="center"
+      left="center"
+      width="50%"
+      height="50%"
+      border={{ type: 'line' }}
+      style={{ border: { fg: 'blue' } }}
+    >
+      Hello World!
     </Box>
   );
 };

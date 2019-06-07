@@ -1,8 +1,8 @@
-import React, { useReducer } from 'react';
-import { Box, Color } from 'ink';
-import { useKeyPress, NavKey } from '../hooks/io';
-import { PathAction } from '../hooks/path';
-import TextInput from '../components/TextInput';
+import React, { useRef, useLayoutEffect } from 'react';
+import { Widgets } from 'blessed';
+import { PathAction } from 'hooks/path';
+import Box from 'components/Box';
+import Text from 'components/Text';
 
 interface PathProps {
   path: string[];
@@ -11,35 +11,29 @@ interface PathProps {
 }
 
 const Path: React.FC<PathProps> = props => {
-  const [selected, next] = useReducer((state: number, key: NavKey) => {
-    switch (key) {
-      case 'left':
-        return Math.max(state - 1, 0);
-      case 'right':
-        return Math.min(state + 1, props.path.length - 1);
-      default:
-        return state;
-    }
-  }, 0);
-  useKeyPress({ onNav: next });
+  const ref = useRef<Widgets.BoxElement>(null);
+  useLayoutEffect(() => {
+    setTimeout(() => {
+      if (!ref.current) return;
+      console.log('doing it');
+      const { key, enableKeys, focus } = ref.current;
+      focus();
+      enableKeys();
+      key('a', function() {
+        console.log('wo');
+      });
+    }, 300);
+  });
+  let i = 0;
   return (
-    <Box>
-      {props.path.map((p, i) => {
-        const isSelected = selected === i;
-        const postfix = i === props.path.length - 1 ? '' : ' / ';
+    <Box ref={ref}>
+      {props.path.map(p => {
+        const offset = i;
+        i += p.length + 1;
         return (
-          <Box key={i}>
-            <Color underline={isSelected}>
-              <TextInput
-                value={p}
-                onChange={v => {
-                  props.pathDispatch({ type: 'edit', ndx: i, value: v });
-                }}
-                disabled={!isSelected}
-              />
-            </Color>
-            {postfix}
-          </Box>
+          <Text key={i} left={offset}>
+            {p}
+          </Text>
         );
       })}
     </Box>

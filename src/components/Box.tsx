@@ -1,9 +1,9 @@
 import React from 'react';
-import { ElementProps } from './Element';
+import { Widgets } from 'blessed';
+import { PropsOf } from 'util/types';
 
-interface BoxProps extends ElementProps {}
-
-const Box: React.FC<BoxProps> = ({ children, ...props }) =>
-  React.createElement('box', props, children);
+const Box = React.forwardRef<Widgets.BoxElement, PropsOf<Widgets.BoxOptions>>((props, ref) =>
+  React.createElement('box', { ...props, ref })
+);
 
 export default Box;

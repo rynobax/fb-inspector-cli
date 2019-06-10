@@ -1,8 +1,8 @@
-import React, { useRef, useLayoutEffect } from 'react';
-import { Widgets } from 'blessed';
+import React, { useState } from 'react';
 import { PathAction } from 'hooks/path';
 import Box from 'components/Box';
 import Text from 'components/Text';
+import useKeyPress from 'hooks/keypress';
 
 interface PathProps {
   path: string[];
@@ -11,29 +11,27 @@ interface PathProps {
 }
 
 const Path: React.FC<PathProps> = props => {
-  const ref = useRef<Widgets.BoxElement>(null);
-  useLayoutEffect(() => {
-    setTimeout(() => {
-      if (!ref.current) return;
-      console.log('doing it');
-      const { key, enableKeys, focus } = ref.current;
-      focus();
-      enableKeys();
-      key('a', function() {
-        console.log('wo');
-      });
-    }, 300);
+  let off = 0;
+  const [active, setActive] = useState(1);
+
+  useKeyPress('path', {
+    left: () => {
+      setActive(active - 1);
+    },
+    right: () => {
+      setActive(active + 1);
+    },
   });
-  let i = 0;
+
   return (
-    <Box ref={ref}>
+    <Box style={{ bg: 'yellow' }}>
       {props.path.map(p => {
-        const offset = i;
-        i += p.length + 1;
+        const offset = off;
+        off += p.length + 1;
         return (
-          <Text key={i} left={offset}>
+          <Box key={off} left={offset} width={p.length}>
             {p}
-          </Text>
+          </Box>
         );
       })}
     </Box>

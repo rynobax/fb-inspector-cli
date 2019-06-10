@@ -6,7 +6,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "nodemon",
+    "start": "ts-node -T src/index.tsx",
     "build": "tsdx build",
     "test": "tsdx test --env=jsdom"
   },
@@ -16,7 +16,7 @@
     }
   },
   "prettier": {
-    "printWidth": 100,
+    "printWidth": 80,
     "semi": true,
     "singleQuote": true,
     "trailingComma": "es5"
@@ -43,6 +43,7 @@
     "blessed": "^0.1.81",
     "got": "^9.6.0",
     "lodash": "^4.17.11",
+    "neo-blessed": "^0.2.0",
     "react": "^16.8.6",
     "react-blessed": "^0.6.0",
     "rxjs": "^6.5.2",

@@ -1,6 +1,6 @@
 import React from 'react';
-import * as blessed from 'blessed';
-import { render } from 'react-blessed';
+import * as blessed from 'neo-blessed';
+import { createBlessedRenderer } from 'react-blessed';
 import fs from 'fs';
 
 const tsConfig = require('../tsconfig.json');
@@ -42,6 +42,7 @@ console.error = (data: any) => {
 };
 
 import Main from './app/Main';
+import ScreenContext from 'context/ScreenContext';
 
 const screen = blessed.screen({
   autoPadding: true,
@@ -73,9 +74,13 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+const render = createBlessedRenderer(blessed);
+
 render(
   <ErrorBoundary>
-    <Main />
+    <ScreenContext.Provider value={screen}>
+      <Main />
+    </ScreenContext.Provider>
   </ErrorBoundary>,
   screen
 );

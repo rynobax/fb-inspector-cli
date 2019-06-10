@@ -1,13 +1,23 @@
 import React from 'react';
 import usePath from 'hooks/path';
-// import Box from '../components/Box';
 import Path from './Path';
-// import { useKeyPress } from '../hooks/io';
-// import * as blessed from 'blessed';
+import Explorer from './Explorer';
+import Box from 'components/Box';
 
-const Main: React.FC = () => {
+interface MainProps {}
+
+const Main: React.FC<MainProps> = () => {
   const [path, pathDispatch] = usePath();
-  return <Path path={path} selected={true} pathDispatch={pathDispatch} />;
+  return (
+    <>
+      <Box>
+        <Path path={path} selected={true} pathDispatch={pathDispatch} />
+      </Box>
+      <Box top={1}>
+        <Explorer path={[]} x={0} y={0} />
+      </Box>
+    </>
+  );
 };
 
 export default Main;

@@ -33,4 +33,4 @@ function reducer(parts: Parts, action: PathAction) {
   }
 }
 
-export default () => useReducer(reducer, ['example', 'path', 'with', 'content', 'last']);
+export default () => useReducer(reducer, ['string']);

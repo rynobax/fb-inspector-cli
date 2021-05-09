@@ -42,7 +42,7 @@
   "dependencies": {
     "blessed": "^0.1.81",
     "got": "^9.6.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "neo-blessed": "^0.2.0",
     "react": "^16.8.6",
     "react-blessed": "^0.6.0",
